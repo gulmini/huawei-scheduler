@@ -65,6 +65,12 @@ vector<int> get_omega(int n, int p, double min_lambda, double max_lambda, double
 
 // n,m,p,gamma,lambda_min,lambda_max,sum_lambda_min,sum_lambda_max,seed
 
+constexpr double eps = 1e-9;
+
+bool leq(double a,double b) {
+    return a-b <= eps;
+}
+
 int main(int argc,char **argv) {
         
     assert(argc == 2);
@@ -72,7 +78,7 @@ int main(int argc,char **argv) {
     string test_case = argv[1];
 
     string gen_path = "gen/" + test_case;
-    string test_case_path = "tc/" + test_case;
+    string test_case_path = "testcases/" + test_case;
 
     FILE *in = fopen(gen_path.c_str(),"r");
     FILE *out = fopen(test_case_path.c_str(),"w");
@@ -88,7 +94,11 @@ int main(int argc,char **argv) {
     int seed;
 
     assert(fscanf(in,"%d %d %d %d %lf %lf %lf %lf %d", &n, &m, &p, &gamma, &lambda_min, &lambda_max, &min_total, &max_total, &seed) == 9);
-   
+
+    assert(m <= (long long)n*(n-1)/2);
+    assert(leq(0,lambda_min) && leq(lambda_min,lambda_max) && leq(lambda_max,1));
+    assert(leq(n * lambda_min,min_total) && leq(min_total,max_total) && leq(max_total,n * lambda_max));
+        
     mt19937 rng(seed);
 
     vector<pair<int,int>> directed_edges = create_random_dag(n,m,rng);
