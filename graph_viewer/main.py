@@ -3,8 +3,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import sys
 
-print(sys.argv)
-
 INPUT_PATH = sys.argv[1]
 
 def parse_graph_file(file_path):
