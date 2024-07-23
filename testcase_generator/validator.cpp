@@ -32,15 +32,17 @@ struct testcase {
     std::vector<std::pair<int, int>> edges;
 
     void read_testcase(FILE *in) {
-        assert(std::fscanf(in, "%d %d %d %d", &n, &m, &p, &gamma));
+        assert(std::fscanf(in, "%d %d %d %d", &n, &m, &p, &gamma) == 4);
         w.resize(n);
         for (auto &x : w) {
-            assert(std::fscanf(in, "%d", &x));
+            assert(std::fscanf(in, "%d", &x) == 1);
         }
         edges.resize(m);
         for (auto &[a, b] : edges) {
-            assert(std::fscanf(in, "%d %d", &a, &b));
+            assert(std::fscanf(in, "%d %d", &a, &b) == 2);
+            // should also assert edges are correct
         }
+        // should assert end of file
     }
 
     bool check_lambda(double lambda_min, double lambda_max) {
