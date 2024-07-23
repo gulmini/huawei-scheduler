@@ -50,8 +50,9 @@ int main(int argc, char **argv){
         pq.pop();
 
         auto core_it = prev(cores.upper_bound({time+1, 0}));
-
-        auto [start_time, core]= *core_it;
+        auto [core_start_time, core]= *core_it;
+        
+        int start_time = max(core_start_time, time);
         int end_time = start_time + omega[v];
 
         cores.erase(core_it);
