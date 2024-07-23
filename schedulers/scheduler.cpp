@@ -71,6 +71,7 @@ int main(int argc, char **argv){
 
     sort(schedule.begin(), schedule.end());
 
+    out << n << " " << p << " " << gamma << "\n";
     for(auto [task, s, e, c]: schedule){
         out << s << " " << e << " " << c << "\n";
     }
