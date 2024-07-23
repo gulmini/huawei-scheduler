@@ -1,55 +1,47 @@
-from math import sqrt
-import networkx as nx 
-import matplotlib.pyplot as plt
 import colorsys
+from turtle import color
+import networkx as nx
+import matplotlib.pyplot as plt
+import sys
 
-g = nx.DiGraph()
+print(sys.argv)
 
-n = 6
+INPUT_PATH = sys.argv[1]
 
-for i in range(n):
-  g.add_node(i)
+def parse_graph_file(file_path):
+  with open(file_path, 'r') as file:
+    graph = nx.DiGraph()
 
-g.add_edge(0, 3)
-g.add_edge(0, 4)
-g.add_edge(0, 5)
+    n, _, _, _ = file.readline().strip().split()
 
-# g.add_edge(1, 3)
-# g.add_edge(1, 4)
-g.add_edge(1, 5)
+    file.readline()
 
-g.add_edge(2, 3)
-g.add_edge(2, 4)
-# g.add_edge(2, 5)
+    for i in range(int(n)):
+      graph.add_node(i)
 
-topological_order = list(nx.topological_sort(g))
+    for line in file:
+      a, b = line.strip().split()
+      graph.add_edge(int(a), int(b))
+    
+    return graph
 
-roots = [node for node in g.nodes if g.in_degree(node) == 0]
+g = parse_graph_file(INPUT_PATH)
+n = g.number_of_nodes()
 
-def x(node):
-  path_lengths = [0]
-  for root in roots:
-    for path in nx.all_simple_paths(g, root, node):
-      path_lengths.append(len(path))
-  return max(path_lengths)
+for layer, nodes in enumerate(nx.topological_generations(g)):
+  for node in nodes:
+    g.nodes[node]["layer"] = layer
 
-base_pos = nx.spring_layout(g, k=100)
+color_order = sorted(list(range(n)), key=lambda i: (g.nodes[i]["layer"], i))
+color_rank = [color_order.index(i) for i in range(n)]
 
-color_index = sorted(list(range(n)), key=lambda i: (x(i), i))
+node_color = [colorsys.hsv_to_rgb(color_rank[i] / n, 0.5, 1) for i in range(n)]
 
-node_color = [colorsys.hsv_to_rgb(i / n, 0.5, 1) for i in range(n)]
-
-color_map = [node_color[i] for i in color_index]
-
-nx.draw(
+nx.draw_networkx(
   g,
-  pos={
-    node: (x(node), base_pos[node][1])
-    for node in g.nodes
-  },
-  with_labels=True,
-  arrows=True,
-  node_color=color_map
+  pos=nx.multipartite_layout(g, subset_key="layer"),
+  node_color=node_color,
+  with_labels=True
 )
 
 plt.show()
