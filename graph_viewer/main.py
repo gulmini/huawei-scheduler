@@ -1,5 +1,4 @@
 import colorsys
-from turtle import color
 import networkx as nx
 import matplotlib.pyplot as plt
 import sys
