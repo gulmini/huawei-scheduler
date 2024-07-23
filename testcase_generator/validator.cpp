@@ -25,6 +25,7 @@ n m p gamma lambda_min lambda_max L_min L_max
 #include <cmath>
 #include <numeric>
 #include <queue>
+#include <set>
 
 struct testcase {
     int n, m, p, gamma; 
@@ -38,11 +39,26 @@ struct testcase {
             assert(std::fscanf(in, "%d", &x) == 1);
         }
         edges.resize(m);
+        std::set<std::pair<int, int>> duplicates;
         for (auto &[a, b] : edges) {
             assert(std::fscanf(in, "%d %d", &a, &b) == 2);
-            // should also assert edges are correct
+            if (a < 0 || a >= n) {
+                printf("Node not in range [0, n)\n");
+                exit(1);
+            }
+            if (b < 0 || b >= n) {
+                printf("Node not in range [0, n)\n");
+                exit(1);
+            }
+            if (duplicates.count({a, b})) {
+                printf("Duplicated edge!\n");
+                exit(1);
+            }
         }
-        // should assert end of file
+        if (fgetc(in) != EOF) {
+            printf("Didn't reach EOF\n");
+            exit(1);
+        }
     }
 
     bool check_lambda(double lambda_min, double lambda_max) {
