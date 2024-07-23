@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
     }
     std::string tc_name = argv[1];
 
-    FILE *tc_in = fopen(("../testcases/" + tc_name).c_str(), "r");
+    FILE *tc_in = fopen(("../testcase/" + tc_name).c_str(), "r");
     if (!tc_in) {
         std::printf("Missing file in directory ../testcase/\n");
         std::exit(1);
