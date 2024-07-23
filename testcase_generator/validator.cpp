@@ -55,6 +55,7 @@ struct testcase {
                 exit(1);
             }
         }
+        assert(fgetc(in) == '\n');
         if (fgetc(in) != EOF) {
             printf("Didn't reach EOF\n");
             exit(1);
@@ -127,7 +128,7 @@ int main(int argc, char **argv) {
     }
     std::string tc_name = argv[1];
 
-    FILE *tc_in = fopen(("../testcases/" + tc_name + ".tc").c_str(), "r");
+    FILE *tc_in = fopen(("../testcases/" + tc_name).c_str(), "r");
     if (!tc_in) {
         std::printf("Missing file in directory ../testcase/\n");
         std::exit(1);
@@ -136,17 +137,17 @@ int main(int argc, char **argv) {
     testcase tc;
     tc.read_testcase(tc_in);
 
-    FILE *param_in = fopen(("gen/" + tc_name + ".gen").c_str(), "r");
+    FILE *param_in = fopen(("gen/" + tc_name).c_str(), "r");
     if (!param_in) {
         std::printf("Missing gen file in gen/\n");
         std::exit(1);
     }
 
-    int n, m, p, gamma;
+    int n, m, p, gamma, seed;
     double L_min, L_max;
     double lambda_min, lambda_max;
 
-    assert(std::fscanf(param_in, "%d %d %d %d %lf %lf %lf %lf", &n, &m, &p, &gamma, &lambda_min, &lambda_max, &L_min, &L_max));
+    assert(std::fscanf(param_in, "%d %d %d %d %lf %lf %lf %lf %d", &n, &m, &p, &gamma, &lambda_min, &lambda_max, &L_min, &L_max, &seed) == 9);
 
     if (L_min < n * lambda_min) {
         printf("L_min is lesser than N * lambda_min\n");
