@@ -51,6 +51,7 @@ vector<int> get_omega(int n, int p, double min_lambda, double max_lambda, double
     vector<int> omega(n,min_omega);
     int placed_omega = n * min_omega;
     int target_omega_sum = sum_gen(rng);
+    assert(placed_omega < target_omega_sum);
 
     while(placed_omega < target_omega_sum) {
         int index = index_gen(rng);
@@ -78,7 +79,7 @@ int main(int argc,char **argv) {
     string test_case = argv[1];
 
     string gen_path = "gen/" + test_case;
-    string test_case_path = "testcases/" + test_case;
+    string test_case_path = "../testcases/" + test_case;
 
     FILE *in = fopen(gen_path.c_str(),"r");
     FILE *out = fopen(test_case_path.c_str(),"w");

@@ -165,9 +165,9 @@ cython_debug/
 # generated stuff
 testcases/*
 output/*
-testcase/*
+testcase_generator/generator
 testcase_generator/gen/*
-testcase_generator/a.out
+testcase_generator/validator
 
 
 # node
