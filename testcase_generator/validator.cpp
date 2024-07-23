@@ -150,17 +150,17 @@ int main(int argc, char **argv) {
     assert(std::fscanf(param_in, "%d %d %d %d %lf %lf %lf %lf %d", &n, &m, &p, &gamma, &lambda_min, &lambda_max, &L_min, &L_max, &seed) == 9);
 
     if (L_min < n * lambda_min) {
-        std::printf("L_min is less than N * lambda_min\n");
+        std::printf("L is less than N * lambda_min\n");
         exit(1);
     }
 
     if (L_max > std::min(gamma, (int)std::floor(n * lambda_max))) {
-        std::printf("L_min is greater than min (gamma, N * lambda_max)\n");
+        std::printf("L is greater than min (gamma, N * lambda_max)\n");
         exit(1);
     }
 
     if (tc.n != n) {
-        std:printf("testcase N doesn't match generator N\n");
+        std::printf("testcase N doesn't match generator N\n");
         exit(1);
     }
     if (tc.m != m) {
