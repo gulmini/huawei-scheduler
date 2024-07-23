@@ -43,21 +43,21 @@ struct testcase {
         for (auto &[a, b] : edges) {
             assert(std::fscanf(in, "%d %d", &a, &b) == 2);
             if (a < 0 || a >= n) {
-                printf("Node not in range [0, n)\n");
+                std::printf("Node not in range [0, n)\n");
                 exit(1);
             }
             if (b < 0 || b >= n) {
-                printf("Node not in range [0, n)\n");
+                std::printf("Node not in range [0, n)\n");
                 exit(1);
             }
             if (duplicates.count({a, b})) {
-                printf("Duplicated edge!\n");
+                std::printf("Duplicated edge!\n");
                 exit(1);
             }
         }
-        assert(fgetc(in) == '\n');
-        if (fgetc(in) != EOF) {
-            printf("Didn't reach EOF\n");
+        assert(std::fgetc(in) == '\n');
+        if (std::fgetc(in) != EOF) {
+            std::printf("Didn't reach EOF\n");
             exit(1);
         }
     }
@@ -150,12 +150,12 @@ int main(int argc, char **argv) {
     assert(std::fscanf(param_in, "%d %d %d %d %lf %lf %lf %lf %d", &n, &m, &p, &gamma, &lambda_min, &lambda_max, &L_min, &L_max, &seed) == 9);
 
     if (L_min < n * lambda_min) {
-        printf("L_min is lesser than N * lambda_min\n");
+        std::printf("L_min is less than N * lambda_min\n");
         exit(1);
     }
 
     if (L_max > std::min(gamma, (int)std::floor(n * lambda_max))) {
-        printf("L_min is greater than min (gamma, N * lambda_max)\n");
+        std::printf("L_min is greater than min (gamma, N * lambda_max)\n");
         exit(1);
     }
 
