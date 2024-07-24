@@ -1,5 +1,7 @@
 # huawei-scheduler
 
+## Configuration
+
 ## Testcase Generation
 
 ### Compile

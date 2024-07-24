@@ -76,10 +76,14 @@ int main(int argc,char **argv) {
         
     assert(argc == 2);
 
+    char *gen_folder, *tc_folder;
+    assert(gen_folder = std::getenv("SCHED_GEN_FOLDER"));
+    assert(tc_folder = std::getenv("SCHED_TC_FOLDER"));
+
     string test_case = argv[1];
 
-    string gen_path = "gen/" + test_case;
-    string test_case_path = "../testcases/" + test_case;
+    string gen_path = gen_folder + ("/" + test_case);
+    string test_case_path = tc_folder + ("/" + test_case);
 
     FILE *in = fopen(gen_path.c_str(),"r");
     FILE *out = fopen(test_case_path.c_str(),"w");

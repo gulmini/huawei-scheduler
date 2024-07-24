@@ -164,6 +164,7 @@ cython_debug/
 
 # generated stuff
 testcases/*
+input/*
 output/*
 testcase_generator/generator
 testcase_generator/gen/*

@@ -2,8 +2,9 @@ import colorsys
 import networkx as nx
 import matplotlib.pyplot as plt
 import sys
+import os
 
-INPUT_PATH = sys.argv[1]
+INPUT_NAME = sys.argv[1]
 
 def parse_graph_file(file_path):
   with open(file_path, 'r') as file:
@@ -22,7 +23,9 @@ def parse_graph_file(file_path):
     
     return graph
 
-g = parse_graph_file(INPUT_PATH)
+assert 'SCHED_TC_FOLDER' in os.environ
+
+g = parse_graph_file(f"{os.environ['SCHED_TC_FOLDER']}/{INPUT_NAME}")
 n = g.number_of_nodes()
 
 for layer, nodes in enumerate(nx.topological_generations(g)):
