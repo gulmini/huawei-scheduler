@@ -82,8 +82,8 @@ int main(int argc,char **argv) {
 
     string test_case = argv[1];
 
-    string gen_path = gen_folder + ("/" + test_case);
-    string test_case_path = tc_folder + ("/" + test_case);
+    string gen_path = gen_folder + ("/" + test_case + ".gen");
+    string test_case_path = tc_folder + ("/" + test_case + ".tc");
 
     FILE *in = fopen(gen_path.c_str(),"r");
     FILE *out = fopen(test_case_path.c_str(),"w");

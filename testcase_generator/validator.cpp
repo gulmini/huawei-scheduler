@@ -132,8 +132,8 @@ int main(int argc, char **argv) {
     assert(gen_folder = std::getenv("SCHED_GEN_FOLDER"));
     assert(tc_folder = std::getenv("SCHED_TC_FOLDER"));
 
-    std::string gen_path = gen_folder + ("/" + tc_name);
-    std::string test_case_path = tc_folder + ("/" + tc_name);
+    std::string gen_path = gen_folder + ("/" + tc_name + ".gen");
+    std::string test_case_path = tc_folder + ("/" + tc_name + ".tc");
 
     FILE *tc_in = fopen(test_case_path.c_str(), "r");
     if (!tc_in) {
