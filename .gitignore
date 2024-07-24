@@ -169,7 +169,8 @@ output/*
 # binaries
 generator
 sched
-validator
+tc_validator
+sched_validator
 
 # node
 node_modules/
