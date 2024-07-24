@@ -26,12 +26,30 @@ The variables are:
  - Generate testcase: `./generator <testcase number>` 
  - Validate testcase: `./validator <testcase number>`
 
+### Scripts
+
+A script is provided to generate testcases in bulk:
+
+ - `scripts/generate.sh` generates from all gen files in `SCHED_GEN_FOLDER`.
+ - `scripts/generate.sh <x>` generates only from the x-th gen file.
+ - `scripts/generate.sh <l> <r>` generates from the gen files in the range [l, r].
+
 ## Schedulers
 
 Custom schedulers can be added in any language.
+Schedulers should be in their own subfolder of `schedulers` and expose an executable named `sched`.
+
 APIs for the implementation are currently avalaible for the following languages:
 
  - C++
+
+### Scripts
+
+A script is provided to schedule testcases in bulk:
+
+ - `scripts/schedule.sh <s>` schedules all tc files in `SCHED_TC_FOLDER` using the scheduler located at `schedulers/<s>/sched`
+ - `scripts/schedule.sh <s> <x>` schedules only the x-th tc file.
+ - `scripts/schedule.sh <s> <l> <r>` schedules the tc files in the range [l, r].
 
 ## Viewers
 Install dependencies:
