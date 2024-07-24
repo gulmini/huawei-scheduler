@@ -128,18 +128,25 @@ int main(int argc, char **argv) {
     }
     std::string tc_name = argv[1];
 
-    FILE *tc_in = fopen(("../testcase/" + tc_name).c_str(), "r");
+    char *gen_folder, *tc_folder;
+    assert(gen_folder = std::getenv("SCHED_GEN_FOLDER"));
+    assert(tc_folder = std::getenv("SCHED_TC_FOLDER"));
+
+    std::string gen_path = gen_folder + ("/" + tc_name + ".gen");
+    std::string test_case_path = tc_folder + ("/" + tc_name + ".tc");
+
+    FILE *tc_in = fopen(test_case_path.c_str(), "r");
     if (!tc_in) {
-        std::printf("Missing file in directory ../testcase/\n");
+        std::printf("Missing file in directory %s\n", tc_folder);
         std::exit(1);
     }
 
     testcase tc;
     tc.read_testcase(tc_in);
 
-    FILE *param_in = fopen(("gen/" + tc_name).c_str(), "r");
+    FILE *param_in = fopen(gen_path.c_str(), "r");
     if (!param_in) {
-        std::printf("Missing gen file in gen/\n");
+        std::printf("Missing gen file in %s\n", gen_folder);
         std::exit(1);
     }
 

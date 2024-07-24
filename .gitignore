@@ -164,11 +164,17 @@ cython_debug/
 
 # generated stuff
 testcases/*
+input/*
 output/*
 testcase_generator/generator
 testcase_generator/gen/*
 testcase_generator/validator
+schedulers/scheduler
 
+# binaries
+generator
+sched
+validator
 
 # node
 node_modules/
