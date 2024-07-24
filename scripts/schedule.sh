@@ -2,7 +2,7 @@
 
 if [[ -z $2 ]]; then
     l=0
-    cnt=$(ls -1 $SCHED_GEN_FOLDER | wc -l)
+    cnt=$(ls -1 $SCHED_TC_FOLDER | wc -l)
     r=$((cnt-1))
 elif [[ -z $3 ]]; then
     l="$2"
@@ -15,4 +15,5 @@ fi
 for i in $(seq $l $r);
 do
   schedulers/"$1"/sched $(printf "%03d" $i)
+  ./sched_validator $(printf "%03d" $i)
 done
