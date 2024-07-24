@@ -15,5 +15,5 @@ fi
 for i in $(seq $l $r);
 do
   schedulers/"$1"/sched $(printf "%03d" $i)
-  ./sched_validator $(printf "%03d" $i)
+  schedule_validator/validator $(printf "%03d" $i)
 done

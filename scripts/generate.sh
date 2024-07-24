@@ -14,6 +14,6 @@ fi
 
 for i in $(seq $l $r);
 do
-  ./generator $(printf "%03d" $i)
-  ./validator $(printf "%03d" $i)
+  testcase_generator/generator $(printf "%03d" $i)
+  testcase_generator/validator $(printf "%03d" $i)
 done

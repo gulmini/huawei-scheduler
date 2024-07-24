@@ -18,13 +18,13 @@ The variables are:
 
 ### Compile
 
- - Generator: `g++ testcase_generator/generator.cpp -o generator`
- - Validator: `g++ testcase_generator/validator.cpp -o tc_validator`
+ - Generator: `g++ testcase_generator/generator.cpp -o testcase_generator/generator`
+ - Validator: `g++ testcase_generator/validator.cpp -o testcase_generator/validator`
 
 ### Running
  
- - Generate testcase: `./generator <testcase number>` 
- - Validate testcase: `./tc_validator <testcase number>`
+ - Generate testcase: `testcase_generator/generator <testcase number>` 
+ - Validate testcase: `testcase_generator/validator <testcase number>`
 
 ### Scripts
 
@@ -45,9 +45,9 @@ APIs for the implementation are currently avalaible for the following languages:
 
 ### Checker
 
-The schedule checker can be compiled with: `g++ schedule_validator/validator.cpp -o sched_validator`.
+The schedule checker can be compiled with: `g++ schedule_validator/validator.cpp -o schedule_validator/validator`.
 
-A schedule can be checked with `./sched_validator <testcase number>`
+A schedule can be checked with `schedule_validator/validator <testcase number>`
 
 ### Scripts
 
