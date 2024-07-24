@@ -1,25 +1,15 @@
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
-#include <bits/stdc++.h>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+#include <array>
 using namespace std;
-using ll = long long;
 
-mt19937 mrand(chrono::steady_clock::now().time_since_epoch().count());
-
-int rng() {
-    return abs((int)mrand());
-}
-
-// Current challenge: finish CSES problemset!!
-
-bool isBetter(vector<int> &a,vector<int> &b,int p) {
+bool isBetter(vector<int> &a,vector<int> &b) {
 
     int mxa = *max_element(a.begin(),a.end());
     int mna = *min_element(a.begin(),a.end());
     int mxb = *max_element(b.begin(),b.end());
     int mnb = *min_element(b.begin(),b.end());
-
-    if (mxa >= p) { return false; }
 
     if (mxa == mxb) {
         return (mxa - mna) < (mxb - mnb);
@@ -29,28 +19,20 @@ bool isBetter(vector<int> &a,vector<int> &b,int p) {
 
 }
 
-bool cmin(vector<int> &a,vector<int> &b,int p) {
-    if (isBetter(b,a,p)) {
+bool cmin(vector<int> &a,vector<int> &b) {
+    if (isBetter(b,a)) {
         a = b;
         return true;
     }
     return false;
 }
 
-int main() {
-    ios_base::sync_with_stdio(false); 
-    cin.tie(nullptr);
-
-    int n,m,p,gamma;
-    cin >> n >> m >> p >> gamma;
-    vector<int> omega(n);
-    for (int i=0;i<n;i++) {
-        cin >> omega[i];
-    }
+vector<array<int,3>> schedule(int n,int m,int p,int gamma,vector<int> omega,vector<int> a,vector<int> b) {
     vector<vector<int>> adj(n);
     vector<int> In(n);
-    for (int x,y,i=0;i<m;i++) {
-        cin >> x >> y;
+    for (int i=0;i<m;i++) {
+        int x = a[i];
+        int y = b[i];
         adj[x].push_back(y);
         In[y]++;
     }
@@ -102,7 +84,7 @@ int main() {
                 new_processes[new_process] = et;
                 new_servers[server] = et;
 
-                if (cmin(servers[mask|(1<<new_process)],new_servers,p)) {
+                if (cmin(servers[mask|(1<<new_process)],new_servers)) {
                     processes[mask|(1<<new_process)] = new_processes;
                     prev[mask|(1<<new_process)] = item{server,new_process,st,et};
                 }
@@ -114,25 +96,14 @@ int main() {
 
     }
 
-    // cout << "went over mask" << endl;
-
-    vector<item> ans(n);
+    vector<array<int,3>> ans(n);
     int mask = (1<<n) - 1;
     while(mask > 0) {
         item lst = prev[mask];
-        if (lst.process == -1) {
-            cout << "No schedule was found\n";
-            return 0;
-        }
-        ans[lst.process] = lst;
+        assert(lst.process!=-1);
+        ans[lst.process] = {lst.st,lst.et,lst.server};
         mask ^= 1<<lst.process;
     }
 
-
-    cout << n << " " << p << " " << gamma << "\n";
-    for (auto &x: ans) {
-        cout << x.st << " " << x.et << " " << x.server << "\n";
-    }
-    
-
+    return ans;
 }
