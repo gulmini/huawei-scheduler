@@ -16,34 +16,30 @@ vector<array<int, 3>> schedule(int N, int M, int P, int Gamma, vector<int> Omega
         indeg[B[i]]++;
     }
 
-    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<>> pq;
+    priority_queue<array<int, 3>, vector<array<int, 3>>, greater<>> pq;
     for(int i=0; i<N; i++){
-        if(indeg[i] == 0) pq.push({0, i});
+        if(indeg[i] == 0) pq.push({Omega[i], 0, i});
     }
 
-    set<pair<int,int>> cores;
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<>> cores;
     for(int i=0; i<Gamma; i++){
-        cores.insert({0, i});
+        cores.push({0, i});
     }
 
     vector<array<int, 4>> schedule;
 
     while(pq.size()){
-        auto [time, v] = pq.top();
+        auto [len, time, v] = pq.top();
         pq.pop();
 
         assert(cores.size());
-
-        auto core_it = cores.upper_bound({time+1, 0});
-        if(core_it != cores.begin()) core_it--;
-        auto [core_start_time, core]= *core_it;
+        auto [core_start_time, core] = cores.top();
+        cores.pop();
         
         int start_time = max(core_start_time, time);
         int end_time = start_time + Omega[v];
 
-        cores.erase(core_it);
-        cores.insert({end_time, core});
-
+        cores.push({end_time, core});
         schedule.push_back({v, start_time, end_time, core});
 
         for(int u: ad[v]){
@@ -51,7 +47,7 @@ vector<array<int, 3>> schedule(int N, int M, int P, int Gamma, vector<int> Omega
             max_time[u] = max(max_time[u], end_time);
 
             if(indeg[u] == 0){
-                pq.push({max_time[u], u});
+                pq.push({Omega[u], max_time[u], u});
             }
         }
     }
