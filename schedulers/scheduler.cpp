@@ -10,36 +10,21 @@
 
 using namespace std;
 
-int main(int argc, char **argv){
-    assert(argc >= 2);
-    string testcase = argv[1];
-    string testcase_path = "../testcases/" + testcase;
-    string output_path = "../output/" + testcase;
-
-    ifstream in(testcase_path);
-    ofstream out(output_path);
-
-    int n, m, p, gamma;
-    in >> n >> m >> p >> gamma;
-
-    vector<int> omega(n);
-    for(int &x: omega) in >> x;
-
-    vector<vector<int>> ad(n);
-    vector<int> indeg(n), max_time(n);
-    for(int i=0; i<m; i++){
-        int a, b; in >> a >> b;
-        ad[a].push_back(b);
-        indeg[b]++;
+vector<array<int, 3>> schedule(int N, int M, int P, int Gamma, vector<int> Omega, vector<int> A, vector<int> B){
+    vector<vector<int>> ad(N);
+    vector<int> indeg(N), max_time(N);
+    for(int i=0; i<M; i++){
+        ad[A[i]].push_back(B[i]);
+        indeg[B[i]]++;
     }
 
     priority_queue<pair<int,int>, vector<pair<int,int>>, greater<>> pq;
-    for(int i=0; i<n; i++){
+    for(int i=0; i<N; i++){
         if(indeg[i] == 0) pq.push({0, i});
     }
 
     set<pair<int,int>> cores;
-    for(int i=0; i<gamma; i++){
+    for(int i=0; i<Gamma; i++){
         cores.insert({0, i});
     }
 
@@ -53,7 +38,7 @@ int main(int argc, char **argv){
         auto [core_start_time, core]= *core_it;
         
         int start_time = max(core_start_time, time);
-        int end_time = start_time + omega[v];
+        int end_time = start_time + Omega[v];
 
         cores.erase(core_it);
         cores.insert({end_time, core});
@@ -71,9 +56,9 @@ int main(int argc, char **argv){
     }
 
     sort(schedule.begin(), schedule.end());
-
-    out << n << " " << p << " " << gamma << "\n";
+    vector<array<int, 3>> ans;
     for(auto [task, s, e, c]: schedule){
-        out << s << " " << e << " " << c << "\n";
+        ans.push_back({s, e, c});
     }
+    return ans;
 }
