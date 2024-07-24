@@ -1,6 +1,4 @@
 #include <cassert>
-#include <fstream>
-#include <string>
 #include <vector>
 #include <utility>
 #include <queue>
@@ -34,7 +32,10 @@ vector<array<int, 3>> schedule(int N, int M, int P, int Gamma, vector<int> Omega
         auto [time, v] = pq.top();
         pq.pop();
 
-        auto core_it = prev(cores.upper_bound({time+1, 0}));
+        assert(cores.size());
+
+        auto core_it = cores.upper_bound({time+1, 0});
+        if(core_it != cores.begin()) core_it--;
         auto [core_start_time, core]= *core_it;
         
         int start_time = max(core_start_time, time);

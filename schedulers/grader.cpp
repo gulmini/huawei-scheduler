@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 #include <array>
-#include <iostream>
 
 using namespace std;
 
@@ -22,6 +21,8 @@ int main(int argc, char **argv){
 
     ifstream in(testcase_path);
     ofstream out(output_path);
+
+    assert(in);
 
     int N, M, P, Gamma;
     in >> N >> M >> P >> Gamma;
