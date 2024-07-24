@@ -6,8 +6,8 @@ import os
 
 FILE_NUMBER = sys.argv[1]
 
-SCHEDULE_FILE_PATH = f"{os.environ.get("SCHED_OUTPUT_FOLDER")}/{FILE_NUMBER}"
-TESTCASE_FILE_PATH = f"{os.environ.get("SCHED_TC_FOLDER")}/{FILE_NUMBER}"
+SCHEDULE_FILE_PATH = f"{os.environ.get("SCHED_OUTPUT_FOLDER")}/{FILE_NUMBER}.sched"
+TESTCASE_FILE_PATH = f"{os.environ.get("SCHED_TC_FOLDER")}/{FILE_NUMBER}.tc"
 VISUALIZATION_PATH = f"{os.environ.get("SCHED_VIS_FOLDER")}/{FILE_NUMBER}.png"
 
 def parse_schedule(path):
@@ -54,20 +54,26 @@ last_time = last_end_time(tasks)
 g = parse_graph(TESTCASE_FILE_PATH)
 g = assign_layer(g)
 node_colors = node_colors(g)
+break_points = list(set([task[0] for task in tasks] + [task[1] for task in tasks]))
 
 ax = plt.gca()
 
 ax.set_xlim([0, last_end_time(tasks) + 1])
 ax.set_ylim([0, gamma])
 
-plt.xticks(range(last_time + 1))
+plt.xticks(break_points)
 plt.yticks(range(gamma))
 
-plt.axvline(x=max(p, last_time), color='red', linestyle='-', linewidth=2)
+plt.axvline(x=p, color='red', linestyle='-', linewidth=2)
 
 for i, task in enumerate(tasks):
   start, end, core = task
-  ax.add_patch(plt.Rectangle((start, core), end - start, 0.8, color=node_colors[i], alpha=0.5))
+  r = plt.Rectangle((start, core), end - start, 0.8, color=node_colors[i], alpha=1)
+  ax.add_patch(r)
+  (rx, ry) = r.get_xy()
+  cx = rx + r.get_width() / 2.0
+  cy = ry + r.get_height() / 2.0
+  ax.annotate(i, (cx, cy), color='black', ha='center', va='center')
 
 ax.grid(True)
 

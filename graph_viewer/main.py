@@ -2,8 +2,10 @@ import colorsys
 import networkx as nx
 import matplotlib.pyplot as plt
 import sys
+import os
 
-INPUT_PATH = sys.argv[1]
+INPUT_NAME = sys.argv[1]
+assert 'SCHED_TC_FOLDER' in os.environ
 
 def parse_graph(file_path):
   with open(file_path, 'r') as file:
@@ -22,6 +24,7 @@ def parse_graph(file_path):
     
     return graph
 
+
 def assign_layer(g):
   for layer, nodes in enumerate(nx.topological_generations(g)):
     for node in nodes:
@@ -33,7 +36,7 @@ def node_colors(g):
   color_rank = [color_order.index(i) for i in range(n)]
   return [colorsys.hsv_to_rgb(color_rank[i] / n, 0.5, 1) for i in range(n)]
 
-g = parse_graph(INPUT_PATH)
+g = parse_graph(f"{os.environ['SCHED_TC_FOLDER']}/{INPUT_NAME}.tc")
 n = g.number_of_nodes()
 
 g = assign_layer(g)

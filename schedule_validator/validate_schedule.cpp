@@ -1,97 +1,284 @@
 #include <iostream>
-#include <vector>
 #include <string>
-#include <cstdio>
-#include <cassert>
+#include <vector>
+#include <fstream>
 #include <algorithm>
-#include <utility>
-#include <limits>
+#include <memory>
 
-struct test_case
+#include "cxxopts.hpp"
+
+namespace validator
 {
-    int period;
-    int cores;
-
-    std::vector<int> wcet;
-    std::vector<std::vector<int>> precedences;
-};
-
-test_case parse_case_file(std::string path)
-{
-    std::FILE* file = std::fopen(path.c_str(), "r");
-    assert(file);
-    
-    int n, m, p, gamma;
-
-    assert(std::fscanf(file, "%d %d %d %d", &n, &m, &p, &gamma) == 4);
-    
-    test_case tc { p, gamma, std::vector<int>(n), std::vector<std::vector<int>>(n) };
-
-    for (int i = 0; i < n; ++i)
-        assert(std::fscanf(file, "%d", &tc.wcet[i]) == 1);
-    
-    for (int i = 0; i < m; ++i)
+    struct input_case
     {
-        int src, dst;
-        assert(std::fscanf(file, "%d %d", &src, &dst) == 2);
-        assert(src >= 0 && src < n && dst >= 0 && dst < n);
-        tc.precedences[src].push_back(dst);
-    }
+        struct edge
+        {
+            int src;
+            int dst;
+        };
 
-    return tc;
-}
+        int p, gamma;
+        std::vector<int> wcets;
+        std::vector<edge> edges;
+    };
 
-void validate_schedule_file(test_case tc, std::string path)
-{
-    std::FILE* file = std::fopen(path.c_str(), "r");
-    assert(file);
-    
-    int n;
-
-    assert(std::fscanf(file, "%d", &n) == 1);
-    
-    std::vector<std::vector<std::pair<int, int>>> cores(tc.cores);
-    std::vector<std::pair<int, int>> segments(n);
-
-    for (int i = 0; i < n; ++i)
+    class input_case_parser
     {
-        int core, start, end;
-        assert(std::fscanf(file, "%d %d %d", &start, &end, &core) == 3);
-        assert(core < tc.cores);
-        assert (end - start == tc.wcet[i]);
-        cores[core].push_back({ start, end });
-        segments[i] = { start, end };
-    }
+    private:
+        std::istream& stream;
 
-    int end = std::numeric_limits<int>::min();
+    public:
+        input_case_parser(std::istream& stream) : stream(stream) {}
 
-    // Check for overlapping tasks on the same core.
-    for (std::vector<std::pair<int, int>>& core : cores)
+        input_case operator()()
+        {
+            std::string line;
+            std::stringstream ss;
+
+            if (!std::getline(stream, line))
+                throw std::invalid_argument("Invalid case header format");
+            ss = std::stringstream(line);
+
+            int n, m, p, gamma;
+            ss >> n >> m >> p >> gamma;
+
+            if (ss.fail())
+                throw std::invalid_argument("Invalid case header format");
+            
+            input_case out{ p, gamma, std::vector<int>(n), std::vector<input_case::edge>(m) };
+
+            if (!std::getline(stream, line))
+                throw std::invalid_argument("Invalid case wcets format");
+            ss = std::stringstream(line);
+
+            for (size_t i = 0; i < out.wcets.size(); ++i)
+                ss >> out.wcets[i];
+            
+            if (ss.fail())
+                throw std::invalid_argument("Invalid case wcets format");
+            
+            for (size_t i = 0; i < out.edges.size(); ++i)
+            {
+                if (!std::getline(stream, line))
+                    throw std::invalid_argument("Found less edges than expected");
+                ss = std::stringstream(line);
+
+                int src, dst;
+                ss >> src >> dst;
+
+                if (ss.fail())
+                    throw std::invalid_argument("Invalid case edges format in edge " + std::to_string(i));
+                
+                out.edges[i] = { src, dst };
+            }
+
+            return out;
+        }
+    };
+
+    struct task_schedule
     {
-        std::sort(core.begin(), core.end());
-        for (int i = 1; i < core.size(); ++i)
-            assert(core[i].first > core[i - 1].second);
-        if (!core.empty())
-            end = std::max(end, core.back().second);
-    }
+        int start;
+        int end;
+        int core;
+    };
+
+    struct schedule
+    {
+        int p, gamma;
+        std::vector<task_schedule> tasks;
+    };
+
+    class scheduler_parser
+    {
+    private:
+        std::istream& stream;
     
-    // Check for broken dependencies.
-    for (int i = 0; i < n; ++i)
-        for (int j = 0; j < tc.precedences[i].size(); ++j)
-            assert(segments[i].second < segments[tc.precedences[i][j]].first);
-    assert(end < tc.period);
+    public:
+        scheduler_parser(std::istream& stream) : stream(stream) {}
+
+        schedule operator()()
+        {
+            std::string line;
+            std::stringstream ss;
+
+            if (!std::getline(stream, line))
+                throw std::invalid_argument("Invalid schedule header");
+            ss = std::stringstream(line);
+
+            int n, p, gamma;
+            ss >> n >> p >> gamma;
+
+            if (ss.fail())
+                throw std::invalid_argument("Invalid schedule header");
+            
+            schedule sc{ p, gamma, std::vector<task_schedule>(n) };
+
+            for (size_t i = 0; i < sc.tasks.size(); ++i)
+            {
+                if (!std::getline(stream, line))
+                    throw std::invalid_argument("Found less tasks than expected");
+                ss = std::stringstream(line);
+
+                int start, end, core;
+                ss >> start >> end >> core;
+
+                if (ss.fail())
+                    throw std::invalid_argument("Invalid schedule task " + std::to_string(i));
+                
+                sc.tasks[i] = { start, end, core };
+            }
+
+            return sc;
+        }
+    };
+
+    class schedule_validator
+    {
+    public:
+        virtual ~schedule_validator() = default;
+        virtual void operator()(const input_case& input, const schedule& sched) const = 0;
+    };
+
+    class schedule_header_consistency_validator : public schedule_validator
+    {
+    public:
+        virtual void operator()(const input_case& input, const schedule& sched) const
+        {
+            if (input.p != sched.p || input.gamma != sched.gamma || input.wcets.size() != sched.tasks.size())
+                throw std::invalid_argument("Schedule header is not consistent with input header");
+        }
+    };
+
+    class schedule_core_consistency_validator : public schedule_validator
+    {
+    public:
+        virtual void operator()(const input_case& input, const schedule& sched) const
+        {
+            for (size_t i = 0; i < sched.tasks.size(); ++i)
+                if (sched.tasks[i].core < 0 || sched.tasks[i].core >= sched.gamma)
+                    throw std::invalid_argument("Task " + std::to_string(i) + " is assigned to invalid core");
+        }
+    };
+
+    class schedule_range_consistency_validator : public schedule_validator
+    {
+    public:
+        virtual void operator()(const input_case& input, const schedule& sched) const
+        {
+            for (size_t i = 0; i < sched.tasks.size(); ++i)
+            {
+                if (sched.tasks[i].start < 0)
+                    throw std::invalid_argument("Task " + std::to_string(i) + " starts at negative time");
+                if (sched.tasks[i].end - sched.tasks[i].start != input.wcets[i])
+                    throw std::invalid_argument("Task " + std::to_string(i) + "'s scheduled range length is not consistent with task's wcet");
+            }
+        }
+    };
+
+    class schedule_range_overlap_validator : public schedule_validator
+    {
+    public:
+        virtual void operator()(const input_case& input, const schedule& sched) const
+        {
+            std::vector<std::vector<std::pair<int, int>>> cores(input.gamma);
+            for (const task_schedule& i : sched.tasks)
+                cores[i.core].push_back({ i.start, i.end });
+            for (std::vector<std::pair<int, int>>& i : cores)
+            {
+                std::sort(i.begin(), i.end());
+                for (size_t j = 1; j < i.size(); ++j)
+                    if (i[j - 1].second > i[j].first)
+                        throw std::invalid_argument("Overlapping tasks");
+            }
+        }
+    };
+
+    class schedule_precedence_validator : public schedule_validator
+    {
+    public:
+        virtual void operator()(const input_case& input, const schedule& sched) const
+        {
+            for (const input_case::edge& i : input.edges)
+                if (sched.tasks[i.src].end > sched.tasks[i.dst].start)
+                    throw std::invalid_argument("Task " + std::to_string(i.dst) + " depends on task " + std::to_string(i.src) + " but starts before it ends");
+        }
+    };
 }
 
 int main(int argc, char* argv[])
 {
-    if (argc != 3)
+    cxxopts::Options options("Schedule Validator", "Validates a schedule over a given input");
+
+    options.add_options()
+        ("case", "Input case number", cxxopts::value<int>())
+        ("h,help", "Print help message");
+    options.parse_positional({ "case" });
+    cxxopts::ParseResult cmdline = options.parse(argc, argv);
+
+    if (cmdline.count("help") || !cmdline.count("case"))
     {
-        std::cerr << "Bad arguments number. Got " << argc - 1 << ", expected " << 2 << "." << std::endl
-            << "Correct parameters: <case_path> <schedule_path>" << std::endl;
+        std::cout << options.help() << std::endl;
         return 1;
     }
 
-    test_case case_parse = parse_case_file(argv[1]);
+    validator::input_case input;
 
-    validate_schedule_file(case_parse, argv[2]);
+    try
+    {
+        std::string input_case_path = std::getenv("SCHED_TC_FOLDER") + ("/" + std::to_string(cmdline["case"].as<int>()));
+        std::ifstream s(input_case_path);
+        validator::input_case_parser case_parser(s);
+        input = case_parser();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "Could not parse case file: " << e.what() << std::endl;
+        return 1;
+    }
+
+    validator::schedule sched;
+
+    try
+    {
+        std::string schedule_path = std::getenv("SCHED_OUTPUT_FOLDER") + ("/" + std::to_string(cmdline["case"].as<int>()));
+        std::ifstream s(schedule_path);
+        validator::scheduler_parser schedule_parser(s);
+        sched = schedule_parser();
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "Could not parse schedule file: " << e.what() << std::endl;
+        return 1;
+    }
+
+    std::map<std::string, std::unique_ptr<validator::schedule_validator>> validators;
+
+    validators["schedule_header_consistency"] = std::unique_ptr<validator::schedule_header_consistency_validator>(new validator::schedule_header_consistency_validator());
+    validators["schedule_core_consistency"] = std::unique_ptr<validator::schedule_core_consistency_validator>(new validator::schedule_core_consistency_validator());
+    validators["schedule_range_consistency"] = std::unique_ptr<validator::schedule_range_consistency_validator>(new validator::schedule_range_consistency_validator());
+    validators["schedule_ranger_overlap"] = std::unique_ptr<validator::schedule_range_overlap_validator>(new validator::schedule_range_overlap_validator());
+    validators["schedule_precedence"] = std::unique_ptr<validator::schedule_precedence_validator>(new validator::schedule_precedence_validator());
+
+
+    std::vector<std::string> torun {
+        "schedule_header_consistency",
+        "schedule_core_consistency",
+        "schedule_range_consistency",
+        "schedule_ranger_overlap",
+        "schedule_precedence"
+    };
+
+    for (const std::string& s : torun)
+    {
+        try
+        {
+            validators[s]->operator()(input, sched);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << "Validator " << s << " failed: " << e.what() << std::endl;
+            return 1;
+        }
+    }
 }
