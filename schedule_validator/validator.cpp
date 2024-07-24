@@ -211,7 +211,7 @@ int main(int argc, char* argv[])
     cxxopts::Options options("Schedule Validator", "Validates a schedule over a given input");
 
     options.add_options()
-        ("case", "Input case number", cxxopts::value<int>())
+        ("case", "Input case number", cxxopts::value<std::string>())
         ("h,help", "Print help message");
     options.parse_positional({ "case" });
     cxxopts::ParseResult cmdline = options.parse(argc, argv);
@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        std::string input_case_path = std::getenv("SCHED_TC_FOLDER") + ("/" + std::to_string(cmdline["case"].as<int>()));
+        std::string input_case_path = std::getenv("SCHED_TC_FOLDER") + ("/" + cmdline["case"].as<std::string>()) + ".tc";
         std::ifstream s(input_case_path);
         validator::input_case_parser case_parser(s);
         input = case_parser();
@@ -241,7 +241,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        std::string schedule_path = std::getenv("SCHED_OUTPUT_FOLDER") + ("/" + std::to_string(cmdline["case"].as<int>()));
+        std::string schedule_path = std::getenv("SCHED_OUTPUT_FOLDER") + ("/" + cmdline["case"].as<std::string>()) + ".sched";
         std::ifstream s(schedule_path);
         validator::scheduler_parser schedule_parser(s);
         sched = schedule_parser();
