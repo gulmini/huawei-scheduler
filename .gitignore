@@ -167,10 +167,10 @@ input/testcases
 output/*
 
 # binaries
-generator
-sched
-tc_validator
-sched_validator
+testcase_generator/generator
+testcase_generator/validator
+schedulers/*/sched
+schedule_validator/validator
 
 # node
 node_modules/
