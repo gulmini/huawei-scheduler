@@ -12,8 +12,13 @@ vector<array<int, 3>> schedule(int N, int M, int P, int Gamma, vector<int> Omega
 int main(int argc, char **argv){
     assert(argc >= 2);
     string testcase = argv[1];
-    string testcase_path = "../testcases/" + testcase;
-    string output_path = "../output/" + testcase;
+
+    char *tc_folder, *output_folder;
+    assert(tc_folder = std::getenv("SCHED_TC_FOLDER"));
+    assert(output_folder = std::getenv("SCHED_OUTPUT_FOLDER"));
+
+    string testcase_path = tc_folder + ("/" + testcase + ".tc");
+    string output_path = output_folder + ("/" + testcase + ".sched");
 
     ifstream in(testcase_path);
     ofstream out(output_path);
