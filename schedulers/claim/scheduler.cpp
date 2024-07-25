@@ -35,46 +35,50 @@ void solve(int pos = 0) {
         return;
     }
     int dim = free_nodes.size();
+
+    // claim: it is optimal to assing the task to the first free core if trying all toposorts
+    int c = 0;
+    for (int i = 1; i < cores; i++) {
+        if (core_time[i] < core_time[c]) {
+            c = i;
+        }
+    }
+
     for (int _i = 0; _i < dim; _i++) {
-        set<int> skip_core;
-        for (int c = 0; c < cores; c++) {
-            int i = free_nodes[_i];
+        int i = free_nodes[_i];
 
-            if (skip_core.count(core_time[c])) continue; // do not try cores with same end time
+        int start = max(core_time[c], free_time[i]);
+        int end = start + w[i];
+        act[i] = {start, end, c};
+        
+        if (start + max_depth[i] >= best_end) continue; // do not recurr if actual max time is > best_end
 
-            int start = max(core_time[c], free_time[i]);
-            int end = start + w[i];
-            act[i] = {start, end, c};
-            
-            if (start + max_depth[i] >= best_end) continue; // do not recurr if actual max time is > best_end
+        int prev_time = core_time[c];
+        core_time[c] = end;
 
-            int prev_time = core_time[c];
-            core_time[c] = end;
-
-            map<int, int> rev;
-            for (auto j : adj[i]) {
-                rev[j] = free_time[j];
-                free_time[j] = max(free_time[j], end);
-                if (--indeg[j] == 0) {
-                    free_nodes.push_back(j);
-                }
+        map<int, int> rev;
+        for (auto j : adj[i]) {
+            rev[j] = free_time[j];
+            free_time[j] = max(free_time[j], end);
+            if (--indeg[j] == 0) {
+                free_nodes.push_back(j);
             }
+        }
 
-            free_nodes[_i] = free_nodes.back();
-            free_nodes.pop_back();
+        free_nodes[_i] = free_nodes.back();
+        free_nodes.pop_back();
 
-            solve(pos + 1);
+        solve(pos + 1);
 
-            free_nodes.push_back(free_nodes[_i]);
-            free_nodes[_i] = i;
+        free_nodes.push_back(free_nodes[_i]);
+        free_nodes[_i] = i;
 
-            core_time[c] = prev_time;
+        core_time[c] = prev_time;
 
-            for (auto j : adj[i]) {
-                free_time[j] = rev[j];
-                if (++indeg[j] == 1) {
-                    free_nodes.pop_back();
-                }
+        for (auto j : adj[i]) {
+            free_time[j] = rev[j];
+            if (++indeg[j] == 1) {
+                free_nodes.pop_back();
             }
         }
     }
