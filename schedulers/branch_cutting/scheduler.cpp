@@ -13,7 +13,7 @@ using namespace std;
 using vi = vector<int>;
 
 int cores, p, n;
-vi indeg, w, core_time, free_time, toposort, free_nodes;
+vi indeg, w, core_time, free_time, free_nodes, max_depth;
 
 vector<array<int, 3>> res;
 vector<array<int, 3>> act;
@@ -36,14 +36,17 @@ void solve(int pos = 0) {
     }
     int dim = free_nodes.size();
     for (int _i = 0; _i < dim; _i++) {
+        set<int> skip_core;
         for (int c = 0; c < cores; c++) {
             int i = free_nodes[_i];
+
+            if (skip_core.count(core_time[i])) continue; // do not try cores with same end time
 
             int start = max(core_time[c], free_time[i]);
             int end = start + w[i];
             act[i] = {start, end, c};
-
-            if (end > best_end) continue;
+            
+            if (start + max_depth[i] >= best_end) continue; // do not recurr if actual max time is > best_end
 
             int prev_time = core_time[c];
             core_time[c] = end;
@@ -87,7 +90,6 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
     core_time.resize(cores);
     act.resize(n);
     indeg.resize(n);
-    toposort.resize(n);
     for (int i = 0; i < m; i++) {
         adj[a[i]].push_back(b[i]);
         indeg[b[i]]++;
@@ -95,6 +97,29 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
     for (int i = 0; i < n; i++) {
         if (indeg[i] == 0) {
             free_nodes.push_back(i);
+        }
+    }
+    {
+        max_depth.resize(n);
+        vi toposort, ind = indeg;
+        queue<int> q;
+        for (auto i : free_nodes) q.push(i);
+        while (!q.empty()) {
+            int i = q.front();
+            q.pop();
+            toposort.push_back(i);
+            for (auto j : adj[i]) {
+                if (--ind[j] == 0) {
+                    q.push(j);
+                }
+            }
+        }
+        reverse(toposort.begin(), toposort.end());
+        for (auto i : toposort) {
+            for (auto j : adj[i]) {
+                max_depth[i] = max(max_depth[j], max_depth[i]);
+            }
+            max_depth[i] += w[i];
         }
     }
     solve();
