@@ -9,6 +9,7 @@
 #include <map>
 #include <iostream>
 #include <functional>
+#include <numeric>
 
 using namespace std;
 using vi = vector<int>;
@@ -22,21 +23,30 @@ vector<array<int, 3>> act;
 vector<vector<int>> adj;
 
 int best_end = INT_MAX;
+int timer_start, opt_bound;
 
 void solve(int pos = 0) {
+    if (best_end == opt_bound) return;
     if (pos == n) {
         int end = 0;
         for (auto [s, e, c] : act) {
             end = max(end, e);
         }
         if (end < best_end) {
-            cerr << end << endl;
+            cerr << end << " " << (clock() * 1000 - timer_start) / CLOCKS_PER_SEC << " ms" << endl;
             best_end = end;
             res = act;
         }
         return;
     }
     int dim = free_nodes.size();
+    vi order(dim);
+    for (int i = 0; i < dim; i++) {
+        order[i] = i;
+    }
+    sort(order.begin(), order.end(), [&](int i, int j){
+        return bound[free_nodes[i]] > bound[free_nodes[j]];
+    });
 
     // claim: it is optimal to assing the task to the first free core if trying all toposorts
     int c = 0;
@@ -46,7 +56,7 @@ void solve(int pos = 0) {
         }
     }
 
-    for (int _i = 0; _i < dim; _i++) {
+    for (auto _i : order) {
         int i = free_nodes[_i];
 
         int start = max(core_time[c], free_time[i]);
@@ -120,9 +130,12 @@ void james_bound(int n) {
     for(int i = 0; i < n; i++){
         bound[i] = max(chain[i], (sum[i] - 1) / cores + 1);
     }
+    opt_bound = *max_element(bound.begin(), bound.end());
+    opt_bound = max(opt_bound, (accumulate(w.begin(), w.end(), 0) + cores - 1) / cores);
 }
 
 vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
+    timer_start = clock()*1000;
     ::w = w;
     ::p = 0;
     ::n = n;
