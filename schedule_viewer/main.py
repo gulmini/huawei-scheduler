@@ -1,3 +1,5 @@
+#!/bin/env python3
+
 import matplotlib.pyplot as plt
 import colorsys
 import networkx as nx
@@ -9,15 +11,17 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--display', action='store_true')
 options = parser.parse_known_args()
 
-FILE_NUMBER = f"{sys.argv[1]:03}"
+SCHEDULER = sys.argv[1]
+FILE_NUMBER = sys.argv[2]
 
-SCHEDULE_FILE_PATH = f"{os.environ.get("SCHED_OUTPUT_FOLDER")}/{FILE_NUMBER}.sched"
+SCHEDULE_FILE_PATH = f"{os.environ.get("SCHED_OUTPUT_FOLDER")}/{SCHEDULER}/{FILE_NUMBER}.sched"
 TESTCASE_FILE_PATH = f"{os.environ.get("SCHED_TC_FOLDER")}/{FILE_NUMBER}.tc"
-if len(sys.argv) > 2:
-  VISUALIZATION_PATH = sys.argv[2]
+
+if len(sys.argv) > 3:
+  VISUALIZATION_PATH = sys.argv[3]
 else:
-  VISUALIZATION_PATH = f"{os.environ.get("SCHED_OUTPUT_VIS_FOLDER")}/{FILE_NUMBER}.png"
-  os.makedirs(f"{os.environ.get("SCHED_OUTPUT_VIS_FOLDER")}", exist_ok=True)
+  VISUALIZATION_PATH = f"{os.environ.get("SCHED_OUTPUT_VIS_FOLDER")}/{SCHEDULER}/{FILE_NUMBER}.png"
+  os.makedirs(f"{os.environ.get("SCHED_OUTPUT_VIS_FOLDER")}/{SCHEDULER}", exist_ok=True)
 
 def parse_schedule(path):
   with open(path, 'r') as file:

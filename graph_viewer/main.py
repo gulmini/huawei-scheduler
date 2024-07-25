@@ -1,3 +1,5 @@
+#!/bin/env python3
+
 import colorsys
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -9,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--display', action='store_true')
 options = parser.parse_known_args()
 
-FILE_NUMBER = f"{sys.argv[1]:03}"
+FILE_NUMBER = sys.argv[1]
 
 TESTCASE_FILE_PATH = f"{os.environ.get("SCHED_TC_FOLDER")}/{FILE_NUMBER}.tc"
 

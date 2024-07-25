@@ -7,6 +7,8 @@
 
 using namespace std;
 
+extern const char* scheduler_name;
+
 vector<array<int, 3>> schedule(int N, int M, int P, int Gamma, vector<int> Omega, vector<int> A, vector<int> B);
 
 int main(int argc, char **argv){
@@ -17,8 +19,8 @@ int main(int argc, char **argv){
     assert(tc_folder = std::getenv("SCHED_TC_FOLDER"));
     assert(output_folder = std::getenv("SCHED_OUTPUT_FOLDER"));
 
-    string testcase_path = tc_folder + ("/" + testcase + ".tc");
-    string output_path = output_folder + ("/" + testcase + ".sched");
+    string testcase_path = tc_folder + ("/" + (scheduler_name + ("/" + testcase)) + ".tc");
+    string output_path = output_folder + ("/" + (scheduler_name + ("/" + testcase)) + ".sched");
 
     ifstream in(testcase_path);
     ofstream out(output_path);
