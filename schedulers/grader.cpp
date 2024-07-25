@@ -19,7 +19,7 @@ int main(int argc, char **argv){
     assert(tc_folder = std::getenv("SCHED_TC_FOLDER"));
     assert(output_folder = std::getenv("SCHED_OUTPUT_FOLDER"));
 
-    string testcase_path = tc_folder + ("/" + (scheduler_name + ("/" + testcase)) + ".tc");
+    string testcase_path = tc_folder + ("/" + testcase) + ".tc";
     string output_path = output_folder + ("/" + (scheduler_name + ("/" + testcase)) + ".sched");
 
     ifstream in(testcase_path);
