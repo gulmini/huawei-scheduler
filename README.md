@@ -77,11 +77,11 @@ if `path` is omitted, it defaults to `$SCHED_GRAPH_VIS_FOLDER/<testcase number>.
 
 Run:<br>
 
-`python3 schedule_viewer/main.py <testcase number> [path] [--display]`<br>
+`python3 schedule_viewer/main.py <sched> <testcase number> [path] [--display]`<br>
 
 with `--display` the graph is showed, otherwise saved.<br>
 
-if `path` is omitted, it defaults to `$SCHED_OUTPUT_VIS_FOLDER/<testcase number>.png`
+if `path` is omitted, it defaults to `$SCHED_OUTPUT_VIS_FOLDER/<sched>/<testcase number>.png`
 
 
 
