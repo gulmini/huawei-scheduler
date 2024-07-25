@@ -6,9 +6,9 @@ import os
 
 FILE_NUMBER = sys.argv[1]
 
-SCHEDULE_FILE_PATH = f"{os.environ.get("SCHED_OUTPUT_FOLDER")}/{FILE_NUMBER}.sched"
-TESTCASE_FILE_PATH = f"{os.environ.get("SCHED_TC_FOLDER")}/{FILE_NUMBER}.tc"
-VISUALIZATION_PATH = f"{os.environ.get("SCHED_VIS_FOLDER")}/{FILE_NUMBER}.png"
+SCHEDULE_FILE_PATH = f"{os.environ.get('SCHED_OUTPUT_FOLDER')}/{FILE_NUMBER}.sched"
+TESTCASE_FILE_PATH = f"{os.environ.get('SCHED_TC_FOLDER')}/{FILE_NUMBER}.tc"
+VISUALIZATION_PATH = f"{os.environ.get('SCHED_VIS_FOLDER')}/{FILE_NUMBER}.png"
 
 def parse_schedule(path):
   with open(path, 'r') as file:
