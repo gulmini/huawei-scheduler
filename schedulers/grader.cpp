@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <filesystem>
 
 using namespace std;
 
@@ -17,6 +18,8 @@ int main(int argc, char **argv){
     char *tc_folder, *output_folder;
     assert(tc_folder = std::getenv("SCHED_TC_FOLDER"));
     assert(output_folder = std::getenv("SCHED_OUTPUT_FOLDER"));
+
+    filesystem::create_directory(output_folder + ("/"s + scheduler_name));
 
     string testcase_path = tc_folder + ("/" + testcase) + ".tc";
     string output_path = output_folder + ("/" + (scheduler_name + ("/" + testcase)) + ".sched");

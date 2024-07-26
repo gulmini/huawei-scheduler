@@ -12,6 +12,8 @@
 using namespace std;
 using vi = vector<int>;
 
+const char *scheduler_name = "correct";
+
 int cores, p, n;
 vi indeg, w, core_time, free_time, toposort, free_nodes;
 

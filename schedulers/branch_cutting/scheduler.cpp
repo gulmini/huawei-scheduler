@@ -12,6 +12,8 @@
 using namespace std;
 using vi = vector<int>;
 
+const char *scheduler_name = "branch_cutting";
+
 int cores, p, n;
 vi indeg, w, core_time, free_time, free_nodes, max_depth;
 

@@ -10,6 +10,8 @@
 
 using namespace std;
 
+const char *scheduler_name = "smart_greedy";
+
 vector<array<int, 3>> schedule(int N, int M, int P, int Gamma, vector<int> Omega, vector<int> A, vector<int> B){
     vector<vector<int>> ad(N);
     vector<int> indeg(N), max_time(N);

@@ -4,6 +4,8 @@
 #include <array>
 using namespace std;
 
+const char *scheduler_name = "papera_matta_satsolver";
+
 bool isBetter(vector<int> &a,vector<int> &b) {
 
     int mxa = *max_element(a.begin(),a.end());
