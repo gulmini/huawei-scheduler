@@ -166,6 +166,8 @@ cython_debug/
 input/testcases
 input/vis
 output/*
+in.txt
+out.txt
 
 # binaries
 testcase_generator/generator
