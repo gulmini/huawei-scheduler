@@ -1,14 +1,27 @@
+#!/bin/env python3
+
 import matplotlib.pyplot as plt
 import colorsys
 import networkx as nx
 import sys
 import os
+import argparse
 
-FILE_NUMBER = sys.argv[1]
+parser = argparse.ArgumentParser()
+parser.add_argument('--display', action='store_true')
+options = parser.parse_known_args()
 
-SCHEDULE_FILE_PATH = f"{os.environ.get('SCHED_OUTPUT_FOLDER')}/{FILE_NUMBER}.sched"
-TESTCASE_FILE_PATH = f"{os.environ.get('SCHED_TC_FOLDER')}/{FILE_NUMBER}.tc"
-VISUALIZATION_PATH = f"{os.environ.get('SCHED_VIS_FOLDER')}/{FILE_NUMBER}.png"
+SCHEDULER = sys.argv[1]
+FILE_NUMBER = sys.argv[2]
+
+SCHEDULE_FILE_PATH = f"{os.environ.get("SCHED_OUTPUT_FOLDER")}/{SCHEDULER}/{FILE_NUMBER}.sched"
+TESTCASE_FILE_PATH = f"{os.environ.get("SCHED_TC_FOLDER")}/{FILE_NUMBER}.tc"
+
+if len(sys.argv) > 3:
+  VISUALIZATION_PATH = sys.argv[3]
+else:
+  VISUALIZATION_PATH = f"{os.environ.get("SCHED_OUTPUT_VIS_FOLDER")}/{SCHEDULER}/{FILE_NUMBER}.png"
+  os.makedirs(f"{os.environ.get("SCHED_OUTPUT_VIS_FOLDER")}/{SCHEDULER}", exist_ok=True)
 
 def parse_schedule(path):
   with open(path, 'r') as file:
@@ -57,6 +70,7 @@ node_colors = node_colors(g)
 break_points = list(set([task[0] for task in tasks] + [task[1] for task in tasks]))
 
 ax = plt.gca()
+fig = plt.gcf()
 
 ax.set_xlim([0, last_end_time(tasks) + 1])
 ax.set_ylim([0, gamma])
@@ -77,6 +91,9 @@ for i, task in enumerate(tasks):
 
 ax.grid(True)
 
-plt.show()
+if options[0].display:
+  plt.show()
+else:
+  fig.savefig(VISUALIZATION_PATH)
 
 

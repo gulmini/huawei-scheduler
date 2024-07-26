@@ -58,9 +58,30 @@ A script is provided to schedule testcases and validate outputs in bulk:
  - `scripts/schedule.sh <s> <l> <r>` schedules the tc files in the range [l, r].
 
 ## Viewers
+
+### Installation
 Install dependencies:
 `pip install networkx matplotlib`
 
-Run:
- - Testcase visualiser: `python3 graph_viewer/main.py <testcase number>`
- - Schedule visualiser: `python3 schedule_viewer/main.py <testcase number>`
+### graph_viewer
+
+Run:<br>
+
+`python3 graph_viewer/main.py <testcase number> [path] [--display]`<br>
+
+with `--display` the graph is showed, otherwise saved.<br>
+
+if `path` is omitted, it defaults to `$SCHED_GRAPH_VIS_FOLDER/<testcase number>.png`
+
+### schedule_viewer
+
+Run:<br>
+
+`python3 schedule_viewer/main.py <sched> <testcase number> [path] [--display]`<br>
+
+with `--display` the graph is showed, otherwise saved.<br>
+
+if `path` is omitted, it defaults to `$SCHED_OUTPUT_VIS_FOLDER/<sched>/<testcase number>.png`
+
+
+

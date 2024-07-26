@@ -1,11 +1,26 @@
+#!/bin/env python3
+
 import colorsys
 import networkx as nx
 import matplotlib.pyplot as plt
 import sys
 import os
+import argparse
 
-INPUT_NAME = sys.argv[1]
-assert 'SCHED_TC_FOLDER' in os.environ
+parser = argparse.ArgumentParser()
+parser.add_argument('--display', action='store_true')
+options = parser.parse_known_args()
+
+FILE_NUMBER = sys.argv[1]
+
+TESTCASE_FILE_PATH = f"{os.environ.get("SCHED_TC_FOLDER")}/{FILE_NUMBER}.tc"
+
+if len(sys.argv) > 2:
+  VISUALIZATION_PATH = sys.argv[2]
+else:
+  VISUALIZATION_PATH = f"{os.environ.get("SCHED_GRAPH_VIS_FOLDER")}/{FILE_NUMBER}.png"
+  os.makedirs(f"{os.environ.get("SCHED_GRAPH_VIS_FOLDER")}", exist_ok=True)
+
 
 def parse_graph(file_path):
   with open(file_path, 'r') as file:
@@ -36,7 +51,7 @@ def node_colors(g):
   color_rank = [color_order.index(i) for i in range(n)]
   return [colorsys.hsv_to_rgb(color_rank[i] / n, 0.5, 1) for i in range(n)]
 
-g = parse_graph(f"{os.environ['SCHED_TC_FOLDER']}/{INPUT_NAME}.tc")
+g = parse_graph(TESTCASE_FILE_PATH)
 n = g.number_of_nodes()
 
 g = assign_layer(g)
@@ -49,4 +64,9 @@ nx.draw_networkx(
   with_labels=True
 )
 
-plt.show()
+fig = plt.gcf()
+
+if options[0].display:
+  plt.show()
+else:
+  fig.savefig(VISUALIZATION_PATH)

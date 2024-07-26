@@ -164,6 +164,7 @@ cython_debug/
 
 # generated stuff
 input/testcases
+input/vis
 output/*
 in.txt
 out.txt
