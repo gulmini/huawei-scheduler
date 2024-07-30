@@ -30,9 +30,6 @@ int best_end = INT_MAX;
 int timer_start, opt_bound;
 
 void solve(int pos = 0) {
-    if ((clock() * 1000 - timer_start) / CLOCKS_PER_SEC > 10000) {
-        std::cerr << c1 << " " << c2 << " " << c3 << " " << c4 << " " << free_space << endl;
-    }
     if (best_end == opt_bound) return;
     if (pos == n) {
         int end = 0;
