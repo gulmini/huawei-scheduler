@@ -14,14 +14,14 @@ options = parser.parse_known_args()
 SCHEDULER = sys.argv[1]
 FILE_NUMBER = sys.argv[2]
 
-SCHEDULE_FILE_PATH = f"{os.environ.get("SCHED_OUTPUT_FOLDER")}/{SCHEDULER}/{FILE_NUMBER}.sched"
-TESTCASE_FILE_PATH = f"{os.environ.get("SCHED_TC_FOLDER")}/{FILE_NUMBER}.tc"
+SCHEDULE_FILE_PATH = f"{os.environ.get('SCHED_OUTPUT_FOLDER')}/{SCHEDULER}/{FILE_NUMBER}.sched"
+TESTCASE_FILE_PATH = f"{os.environ.get('SCHED_TC_FOLDER')}/{FILE_NUMBER}.tc"
 
 if len(sys.argv) > 3:
   VISUALIZATION_PATH = sys.argv[3]
 else:
-  VISUALIZATION_PATH = f"{os.environ.get("SCHED_OUTPUT_VIS_FOLDER")}/{SCHEDULER}/{FILE_NUMBER}.png"
-  os.makedirs(f"{os.environ.get("SCHED_OUTPUT_VIS_FOLDER")}/{SCHEDULER}", exist_ok=True)
+  VISUALIZATION_PATH = f"{os.environ.get('SCHED_OUTPUT_VIS_FOLDER')}/{SCHEDULER}/{FILE_NUMBER}.png"
+  os.makedirs(f"{os.environ.get('SCHED_OUTPUT_VIS_FOLDER')}/{SCHEDULER}", exist_ok=True)
 
 def parse_schedule(path):
   with open(path, 'r') as file:

@@ -16,8 +16,10 @@ using vi = vector<int>;
 
 const char *scheduler_name = "claim";
 
-int cores, p, n;
-vi indeg, w, core_time, free_time, free_nodes, max_depth, bound;
+int cores, p, n, free_space;
+vi indeg, w, core_time, free_time, free_nodes, max_depth, bound, sub_sum;
+
+int c1 = 0, c2 = 0, c3 = 0, c4 = 0;
 
 vector<array<int, 3>> res;
 vector<array<int, 3>> act;
@@ -36,6 +38,7 @@ void solve(int pos = 0) {
         }
         if (end < best_end) {
             cerr << end << " " << (clock() * 1000 - timer_start) / CLOCKS_PER_SEC << " ms" << endl;
+            free_space -= cores * (best_end - end);
             best_end = end;
             res = act;
         }
@@ -50,50 +53,75 @@ void solve(int pos = 0) {
         return bound[free_nodes[i]] > bound[free_nodes[j]];
     });
 
-    // claim: it is optimal to assing the task to the first free core if trying all toposorts
-    int c = 0;
-    for (int i = 1; i < cores; i++) {
-        if (core_time[i] < core_time[c]) {
-            c = i;
+    int c_min = 0;
+    vector<array<int, 2>> sorted_cores;
+    for (int i = 0; i < cores; i++) {
+        sorted_cores.push_back({core_time[i], i});
+        if (core_time[i] < core_time[c_min]) {
+            c_min = i;
         }
     }
+    sort(sorted_cores.begin(), sorted_cores.end());
+    vector<int> cores_to_try = {c_min, c_min};
 
     for (auto _i : order) {
         int i = free_nodes[_i];
+        auto it = upper_bound(sorted_cores.begin(), sorted_cores.end(), free_time[i]);
+        if (it != sorted_cores.begin()) it--;
+        cores_to_try[0] = (*it)[1];
 
-        int start = max(core_time[c], free_time[i]);
-        int end = start + w[i];
-        act[i] = {start, end, c};
-        
-        if (start + max_depth[i] >= best_end) continue; // do not recurr if actual max time is > best_end
-        if (start + bound[i] >= best_end) continue; // do not recurr if actual max time is > best_end
-
-        int prev_time = core_time[c];
-        core_time[c] = end;
-
-        map<int, int> rev;
-        for (auto j : adj[i]) {
-            rev[j] = free_time[j];
-            free_time[j] = max(free_time[j], end);
-            if (--indeg[j] == 0) {
-                free_nodes.push_back(j);
+        for (auto c : cores_to_try) {
+            int start = max(core_time[c], free_time[i]);
+            int end = start + w[i];
+            act[i] = {start, end, c};
+            
+            if (start + max_depth[i] >= best_end) {
+                c1++;
+                continue; 
             }
-        }
+            if (start + bound[i] >= best_end) {
+                c2++;
+                continue; 
+            }
+            if ((best_end - end) * cores < sub_sum[i]) {
+                c3++;
+                continue;
+            }
+            if (free_space < sub_sum[i] + w[i]) {
+                c4++;
+                continue;
+            }
 
-        free_nodes[_i] = free_nodes.back();
-        free_nodes.pop_back();
+            int prev_time = core_time[c];
+            core_time[c] = end;
 
-        solve(pos + 1);
+            free_space -= end - prev_time;
 
-        free_nodes.push_back(free_nodes[_i]);
-        free_nodes[_i] = i;
+            map<int, int> rev;
+            for (auto j : adj[i]) {
+                rev[j] = free_time[j];
+                free_time[j] = max(free_time[j], end);
+                if (--indeg[j] == 0) {
+                    free_nodes.push_back(j);
+                }
+            }
 
-        core_time[c] = prev_time;
+            free_nodes[_i] = free_nodes.back();
+            free_nodes.pop_back();
 
-        for (auto j : adj[i]) {
-            free_time[j] = rev[j];
-            if (++indeg[j] == 1) {
-                free_nodes.pop_back();
+            solve(pos + 1);
+
+            free_nodes.push_back(free_nodes[_i]);
+            free_nodes[_i] = i;
+
+            free_space += end - prev_time;
+            core_time[c] = prev_time;
+
+            for (auto j : adj[i]) {
+                free_time[j] = rev[j];
+                if (++indeg[j] == 1) {
+                    free_nodes.pop_back();
+                }
             }
         }
     }
@@ -101,6 +129,7 @@ void solve(int pos = 0) {
 
 void james_bound(int n) {
     vi chain(n), vis(n), sum(n);
+    sub_sum.resize(n);
     std::function<void(int)> calc_chain = [&](int v){
         chain[v] = w[v];
         vis[v] = 1;
@@ -126,6 +155,7 @@ void james_bound(int n) {
         sum[i] = 0;
         vis.assign(n, 0);
         calc_sum(i, i);
+        sub_sum[i] = sum[i] - w[i];
     }
 
     bound.resize(n);
@@ -147,6 +177,8 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
     core_time.resize(cores);
     act.resize(n);
     indeg.resize(n);
+    free_space = cores * p;
+    best_end = accumulate(w.begin(), w.end(), 0) + 10;
     for (int i = 0; i < m; i++) {
         adj[a[i]].push_back(b[i]);
         indeg[b[i]]++;
@@ -181,5 +213,6 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
         }
     }
     solve();
+    // cerr << c1 << " " << c2 << " " << c3 << " " << c4 << endl;
     return res;
 }
