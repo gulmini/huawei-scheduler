@@ -17,10 +17,6 @@ file.close()
 
 s_variables = [Int(f"s{i}") for i in range(n)]
 c_variables = [Int(f"c{i}") for i in range(n)]
-b_i_j_1_variables = [Bool(f"b{i}_{j}_1") for i in range(n) for j in range(n)]
-b_i_j_2_variables = [Bool(f"b{i}_{j}_2") for i in range(n) for j in range(n)]
-b_i_j_3_variables = [Bool(f"b{i}_{j}_3") for i in range(n) for j in range(n)]
-d_i_j_k_variables = [Bool(f"d{i}_{j}_{k}") for i in range(n) for j in range(n) for k in range(gamma)]
 
 T = Int("T")
 
@@ -30,8 +26,6 @@ opt = Optimize()
 for i in range(n):
   opt.add(c_variables[i] >= 0)
   opt.add(c_variables[i] < gamma)
-
-M = 1_000_000
 
 for i in range(n):
   s_i = s_variables[i]
@@ -48,30 +42,15 @@ for i in range(n):
     s_j = s_variables[j]
     omega_j = omega[j]
     c_j = c_variables[j]
-    b_i_j_1 = b_i_j_1_variables[i * n + j]
-    b_i_j_2 = b_i_j_2_variables[i * n + j]
-    b_i_j_3 = b_i_j_3_variables[i * n + j]
-    d_i_j_k = [d_i_j_k_variables[i * n * gamma + j * gamma + k] for k in range(gamma)]
-      
+
     # non sovrapposizione
-    opt.add(s_i + omega_i <= s_j + M * (1 - If(b_i_j_1, 1, 0)))
-    opt.add(s_j + omega_j <= s_i + M * (1 - If(b_i_j_2, 1, 0)))
-    opt.add(b_i_j_1 + b_i_j_2 >= 1)
-
-    # for k in range(gamma):
-    #   opt.add(d_i_j_k[k] >= c_i - k + 1 - M * (1 - If(b_i_j_3, 1, 0)))
-    #   opt.add(d_i_j_k[k] >= k - c_i + 1 - M * (1 - If(b_i_j_3, 1, 0)))
-    #   opt.add(d_i_j_k[k] <= M * (1 - If(b_i_j_3, 1, 0)))
-    #   opt.add(d_i_j_k[k] <= c_i - k)
-    #   opt.add(d_i_j_k[k] <= k - c_i)
-
-    # opt.add(
-    #   Or(
-    #     c_i != c_j,
-    #     s_i + omega_i <= s_j,
-    #     s_j + omega_j <= s_i
-    #   )
-    # )
+    opt.add(
+      Or(
+        c_i != c_j,
+        s_i + omega_i <= s_j,
+        s_j + omega_j <= s_i
+      )
+    )
 
 # vincolo di precedenza
 for i, j in edges:

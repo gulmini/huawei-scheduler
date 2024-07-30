@@ -1,8 +1,10 @@
+declare -i n=$#
 skip_tools=false
 
 for arg in "$@"; do
     if [ "$arg" = "--no-tools" ]; then
         skip_tools=true
+        n+=-1
         break
     fi
 done
@@ -13,7 +15,7 @@ if [ "$skip_tools" = false ]; then
     g++ schedule_validator/validator.cpp -o schedule_validator/validator
 fi
 
-if [ $# -eq 0 ]; then
+if [ $n -eq 0 ]; then
     for scheduler in $(ls -d schedulers/*/);
     do
         echo $scheduler
