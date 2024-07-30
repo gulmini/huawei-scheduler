@@ -1,10 +1,9 @@
-from re import I
 from z3 import *
 
 FILE_NUMBER = sys.argv[1]
 
 TESTCASE_FILE_PATH = f"{os.environ.get("SCHED_TC_FOLDER")}/{FILE_NUMBER}.tc"
-SCHEDULE_FILE_PATH = f"{os.environ.get("SCHED_OUTPUT_FOLDER")}/{FILE_NUMBER}.sched"
+SCHEDULE_FILE_PATH = f"{os.environ.get("SCHED_OUTPUT_FOLDER")}/z3/{FILE_NUMBER}.sched"
 
 file = open(TESTCASE_FILE_PATH, "r")
 n, m, p, gamma = map(int, file.readline().strip().split())
@@ -35,6 +34,9 @@ def get_solver(p):
     # Non-negativita'
     solver.add(s_i >= 0)
 
+    # finisce in tempo
+    solver.add(s_i + omega_i <= p)
+
     for j in range(i + 1, n):
       s_j = s_variables[j]
       omega_j = omega[j]
@@ -52,9 +54,6 @@ def get_solver(p):
   # vincolo di precedenza
   for i, j in edges:
     solver.add(s_variables[i] + omega[i] <= s_variables[j])
-
-  # finisce in tempo
-  solver.add(s_i + omega_i <= p)
 
   return solver
 
@@ -83,12 +82,12 @@ if solver.check() == sat:
 
   file = open(SCHEDULE_FILE_PATH, "w")
 
-  file.write(f"{n} {p} {gamma}")
+  file.write(f"{n} {p} {gamma}\n")
 
   for s_i, c_i, w_i in zip(s_variables, c_variables, omega):
     s_i = model[s_i].as_long()
     c_i = model[c_i].as_long()
-    file.write(f"{s_i} {s_i + w_i} {c_i}")
+    file.write(f"{s_i} {s_i + w_i} {c_i}\n")
 
 else:
   print("No solution found.")
