@@ -30,6 +30,9 @@ int best_end = INT_MAX;
 int timer_start, opt_bound;
 
 void solve(int pos = 0) {
+    if ((clock() * 1000 - timer_start) / CLOCKS_PER_SEC > 10000) {
+        std::cerr << c1 << " " << c2 << " " << c3 << " " << c4 << " " << free_space << endl;
+    }
     if (best_end == opt_bound) return;
     if (pos == n) {
         int end = 0;
@@ -54,7 +57,7 @@ void solve(int pos = 0) {
     });
 
     int c_min = 0;
-    vector<array<int, 2>> sorted_cores;
+    vector<pair<int, int>> sorted_cores;
     for (int i = 0; i < cores; i++) {
         sorted_cores.push_back({core_time[i], i});
         if (core_time[i] < core_time[c_min]) {
@@ -66,9 +69,9 @@ void solve(int pos = 0) {
 
     for (auto _i : order) {
         int i = free_nodes[_i];
-        auto it = upper_bound(sorted_cores.begin(), sorted_cores.end(), free_time[i]);
+        auto it = upper_bound(sorted_cores.begin(), sorted_cores.end(), make_pair(free_time[i] + 1, -1));
         if (it != sorted_cores.begin()) it--;
-        cores_to_try[0] = (*it)[1];
+        cores_to_try[0] = it->second;
 
         for (auto c : cores_to_try) {
             int start = max(core_time[c], free_time[i]);
@@ -87,7 +90,7 @@ void solve(int pos = 0) {
                 c3++;
                 continue;
             }
-            if (free_space < sub_sum[i] + w[i]) {
+            if (free_space - cores < sub_sum[i] + w[i]) {
                 c4++;
                 continue;
             }
@@ -167,7 +170,7 @@ void james_bound(int n) {
 }
 
 vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
-    timer_start = clock()*1000;
+    timer_start = clock() * 1000;
     ::w = w;
     ::p = 0;
     ::n = n;
@@ -177,8 +180,8 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
     core_time.resize(cores);
     act.resize(n);
     indeg.resize(n);
-    free_space = cores * p;
     best_end = accumulate(w.begin(), w.end(), 0) + 10;
+    free_space = cores * best_end;
     for (int i = 0; i < m; i++) {
         adj[a[i]].push_back(b[i]);
         indeg[b[i]]++;
@@ -213,6 +216,6 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
         }
     }
     solve();
-    // cerr << c1 << " " << c2 << " " << c3 << " " << c4 << endl;
+    std::cerr << c1 << " " << c2 << " " << c3 << " " << c4 << " " << free_space << endl;
     return res;
 }
