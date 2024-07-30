@@ -16,7 +16,7 @@ using vi = vector<int>;
 
 const char *scheduler_name = "claim";
 
-int cores, p, n, free_space;
+int cores, p, n, free_space, to_be_placed;
 vi indeg, w, core_time, free_time, free_nodes, max_depth, bound, sub_sum;
 
 int c1 = 0, c2 = 0, c3 = 0, c4 = 0;
@@ -90,7 +90,7 @@ void solve(int pos = 0) {
                 c3++;
                 continue;
             }
-            if (free_space - cores < sub_sum[i] + w[i]) {
+            if (free_space - cores < to_be_placed) {
                 c4++;
                 continue;
             }
@@ -111,9 +111,11 @@ void solve(int pos = 0) {
 
             free_nodes[_i] = free_nodes.back();
             free_nodes.pop_back();
+            to_be_placed -= w[i];
 
             solve(pos + 1);
 
+            to_be_placed += w[i];
             free_nodes.push_back(free_nodes[_i]);
             free_nodes[_i] = i;
 
@@ -180,7 +182,8 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
     core_time.resize(cores);
     act.resize(n);
     indeg.resize(n);
-    best_end = accumulate(w.begin(), w.end(), 0) + 10;
+    to_be_placed = accumulate(w.begin(), w.end(), 0);
+    best_end = to_be_placed + 10;
     free_space = cores * best_end;
     for (int i = 0; i < m; i++) {
         adj[a[i]].push_back(b[i]);
