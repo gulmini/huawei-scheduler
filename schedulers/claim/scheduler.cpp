@@ -19,7 +19,7 @@ const char *scheduler_name = "claim";
 int cores, p, n, free_space, to_be_placed;
 vi indeg, w, core_time, free_time, free_nodes, max_depth, bound, sub_sum;
 
-int c1 = 0, c2 = 0, c3 = 0, c4 = 0;
+int c1 = 0, c2 = 0, c3 = 0;
 
 vector<array<int, 3>> res;
 vector<array<int, 3>> act;
@@ -37,7 +37,6 @@ void solve(int pos = 0) {
             end = max(end, e);
         }
         if (end < best_end) {
-            cerr << end << " " << (clock() * 1000 - timer_start) / CLOCKS_PER_SEC << " ms" << endl;
             free_space -= cores * (best_end - end);
             best_end = end;
             res = act;
@@ -50,7 +49,7 @@ void solve(int pos = 0) {
         order[i] = i;
     }
     sort(order.begin(), order.end(), [&](int i, int j){
-        return bound[free_nodes[i]] > bound[free_nodes[j]];
+        return max_depth[free_nodes[i]] > max_depth[free_nodes[j]];
     });
 
     int c_min = 0;
@@ -62,7 +61,7 @@ void solve(int pos = 0) {
         }
     }
     sort(sorted_cores.begin(), sorted_cores.end());
-    vector<int> cores_to_try = {c_min, c_min};
+    vector<int> cores_to_try = {c_min};
 
     for (auto _i : order) {
         int i = free_nodes[_i];
@@ -79,16 +78,12 @@ void solve(int pos = 0) {
                 c1++;
                 continue; 
             }
-            if (start + bound[i] >= best_end) {
-                c2++;
-                continue; 
-            }
             if ((best_end - end) * cores < sub_sum[i]) {
-                c3++;
+                c2++;
                 continue;
             }
             if (free_space - cores < to_be_placed) {
-                c4++;
+                c3++;
                 continue;
             }
 
@@ -132,19 +127,6 @@ void solve(int pos = 0) {
 void james_bound(int n) {
     vi chain(n), vis(n), sum(n);
     sub_sum.resize(n);
-    std::function<void(int)> calc_chain = [&](int v){
-        chain[v] = w[v];
-        vis[v] = 1;
-        for(int u : adj[v]){
-            if(!vis[u]) calc_chain(u);
-            chain[v] = max(chain[v], chain[u] + w[v]);
-        }
-    };
-    for(int i = 0; i < n; i++) {
-        if (!vis[i]) {
-            calc_chain(i);
-        }
-    }
     
     function<void(int, int)> calc_sum = [&](int v, int p){
         sum[p] += w[v];
@@ -160,11 +142,7 @@ void james_bound(int n) {
         sub_sum[i] = sum[i] - w[i];
     }
 
-    bound.resize(n);
-    for(int i = 0; i < n; i++){
-        bound[i] = max(chain[i], (sum[i] - 1) / cores + 1);
-    }
-    opt_bound = *max_element(bound.begin(), bound.end());
+    opt_bound = *max_element(max_depth.begin(), max_depth.end());
     opt_bound = max(opt_bound, (accumulate(w.begin(), w.end(), 0) + cores - 1) / cores);
 }
 
@@ -191,7 +169,6 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
             free_nodes.push_back(i);
         }
     }
-    james_bound(n);
     {
         max_depth.resize(n);
         vi toposort, ind = indeg;
@@ -215,7 +192,7 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
             max_depth[i] += w[i];
         }
     }
+    james_bound(n);
     solve();
-    std::cerr << c1 << " " << c2 << " " << c3 << " " << c4 << " " << free_space << endl;
     return res;
 }
