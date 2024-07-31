@@ -13,13 +13,13 @@ options = parser.parse_known_args()
 
 FILE_NUMBER = sys.argv[1]
 
-TESTCASE_FILE_PATH = f"{os.environ.get("SCHED_TC_FOLDER")}/{FILE_NUMBER}.tc"
+TESTCASE_FILE_PATH = f"{os.environ.get('SCHED_TC_FOLDER')}/{FILE_NUMBER}.tc"
 
 if len(sys.argv) > 2:
   VISUALIZATION_PATH = sys.argv[2]
 else:
-  VISUALIZATION_PATH = f"{os.environ.get("SCHED_GRAPH_VIS_FOLDER")}/{FILE_NUMBER}.png"
-  os.makedirs(f"{os.environ.get("SCHED_GRAPH_VIS_FOLDER")}", exist_ok=True)
+  VISUALIZATION_PATH = f"{os.environ.get('SCHED_GRAPH_VIS_FOLDER')}/{FILE_NUMBER}.png"
+  os.makedirs(f"{os.environ.get('SCHED_GRAPH_VIS_FOLDER')}", exist_ok=True)
 
 
 def parse_graph(file_path):

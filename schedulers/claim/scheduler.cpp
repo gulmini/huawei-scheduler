@@ -37,6 +37,7 @@ void solve(int pos = 0) {
             end = max(end, e);
         }
         if (end < best_end) {
+            cerr << end << endl;
             free_space -= cores * (best_end - end);
             best_end = end;
             res = act;
