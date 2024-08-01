@@ -24,7 +24,6 @@ int best_end = INT_MAX;
 
 void solve(int _i, int first_free = 1) {
     if (best_end == opt_bound) return;
-    int i = sorted_tasks[_i];
     if (_i == n) {
         vi temp_indeg = indeg;
         int ans = 0;
@@ -61,6 +60,7 @@ void solve(int _i, int first_free = 1) {
         }
         return;
     }
+    int i = sorted_tasks[_i];
     vi sorted;
     for (int c = 0; c < min(cores, first_free + 1); c++) {
         sorted.push_back(c);
@@ -90,8 +90,6 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
     load.resize(cores);
     sorted_tasks.resize(n);
     iota(sorted_tasks.begin(), sorted_tasks.end(), 0);
-    srand(420);
-    random_shuffle(sorted_tasks.begin(), sorted_tasks.end());
     for (int i = 0; i < m; i++) {
         adj[a[i]].push_back(b[i]);
         indeg[b[i]]++;
@@ -126,7 +124,6 @@ vector<array<int, 3>> schedule(int n, int m, int p, int y, vi w, vi a, vi b) {
         opt_bound = *max_element(max_depth.begin(), max_depth.end());
         opt_bound = max(opt_bound, (accumulate(w.begin(), w.end(), 0) + cores - 1) / cores);
     }
-
 
     solve(0);
 
