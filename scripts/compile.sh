@@ -11,8 +11,8 @@ done
 
 if [ "$skip_tools" = false ]; then
     g++ testcase_generator/generator.cpp -o testcase_generator/generator
-    g++ testcase_generator/validator.cpp -o testcase_generator/validator
-    g++ schedule_validator/validator.cpp -o schedule_validator/validator
+    # g++ testcase_generator/validator.cpp -o testcase_generator/validator
+    # g++ schedule_validator/validator.cpp -o schedule_validator/validator
 fi
 
 if [ $n -eq 0 ]; then

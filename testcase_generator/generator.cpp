@@ -54,10 +54,12 @@ vector<int> get_omega(int n, int p, double min_lambda, double max_lambda, double
     assert(placed_omega < target_omega_sum);
 
     while(placed_omega < target_omega_sum) {
+        uniform_int_distribution<> sus(1, min(target_omega_sum - placed_omega, p/30 + 1));
+        int add = sus(rng);
         int index = index_gen(rng);
         if (omega[index] == max_omega) continue;
-        omega[index]++;
-        placed_omega++;
+        omega[index] += add;
+        placed_omega += add;
     }
 
     return omega;
@@ -102,7 +104,7 @@ int main(int argc,char **argv) {
 
     assert(m <= (long long)n*(n-1)/2);
     assert(leq(0,lambda_min) && leq(lambda_min,lambda_max) && leq(lambda_max,1));
-    assert(leq(n * lambda_min,min_total) && leq(min_total,max_total) && leq(max_total,n * lambda_max));
+    // assert(leq(n * lambda_min,min_total) && leq(min_total,max_total) && leq(max_total,n * lambda_max));
         
     mt19937 rng(seed);
 

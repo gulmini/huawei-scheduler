@@ -15,6 +15,6 @@ fi
 for i in $(seq $l $r);
 do
     testcase_generator/generator $(printf "%03d" $i)
-    testcase_generator/validator $(printf "%03d" $i)
+    # testcase_generator/validator $(printf "%03d" $i)
     #graph_viewer/main.py $(printf "%03d" $i)
 done

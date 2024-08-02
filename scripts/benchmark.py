@@ -39,6 +39,6 @@ if __name__ == '__main__':
 
         print(f"Testcase {tc}: {tt}")
     
-    with open(os.path.dirname(__file__) + "/../" + os.environ['BENCH_OUTPUT_FOLDER'] + "/" + sys.argv[1] + ".bench", "w") as f:
+    with open(os.path.dirname(__file__) + "/../" + os.environ['BENCH_OUTPUT_FOLDER'] + "/" + sys.argv[1] + ".bench", "a") as f:
         for k in range(len(times)):
             f.write("{:03d}".format(k + start) + "," + str(times[k]) + "\n")
